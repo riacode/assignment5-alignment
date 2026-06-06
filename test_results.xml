@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="19" time="0.303" timestamp="2026-06-04T02:36:52.332169-07:00" hostname="Rias-MacBook-Pro.local"><testcase classname="tests.test_grpo" name="test_tokenize_prompt_and_output" time="0.031"><failure message="AssertionError: &#10;Not equal to tolerance rtol=0.0001, atol=0.01&#10;Array 'input_ids' does not match snapshot for test_tokenize_prompt_and_output&#10;Mismatched elements: 1 / 27 (3.7%)&#10;Max absolute difference among violations: 2&#10;Max relative difference among violations: inf&#10; ACTUAL: array([[3, 2, 4, 2, 3, 2, 4, 2, 0],&#10;       [5, 6, 7, 8, 2, 5, 6, 7, 8],&#10;       [5, 6, 9, 8, 2, 5, 6, 9, 8]])&#10; DESIRED: array([[3, 2, 4, 2, 3, 2, 4, 0, 0],&#10;       [5, 6, 7, 8, 2, 5, 6, 7, 8],&#10;       [5, 6, 9, 8, 2, 5, 6, 9, 8]])">numpy_snapshot = &lt;tests.conftest.NumpySnapshot object at 0x10feb8770&gt;
+prompt_strs = ['Hello, world!', 'This is a test.', 'This is another test.']
+output_strs = ['Hello, world!', 'This is a test.', 'This is another test.']
+tokenizer = TokenizersBackend(name_or_path='', vocab_size=15, model_max_length=1000000000000000019884624838656, padding_side='righ...ecial=True),
+	2: AddedToken("&lt;unk&gt;", rstrip=False, lstrip=False, single_word=False, normalized=False, special=True),
+})
+
+    def test_tokenize_prompt_and_output(numpy_snapshot, prompt_strs, output_strs, tokenizer):
+        output = tokenize_prompt_and_output(
+            prompt_strs=prompt_strs,
+            output_strs=output_strs,
+            tokenizer=tokenizer,
+        )
+&gt;       numpy_snapshot.assert_match(output)
+
+tests/test_grpo.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;tests.conftest.NumpySnapshot object at 0x10feb8770&gt;
+actual = {'input_ids': tensor([[3, 2, 4, 2, 3, 2, 4, 2, 0],
+        [5, 6, 7, 8, 2, 5, 6, 7, 8],
+        [5, 6, 9, 8, 2, 5, 6, ... 1., 1., 1., 1., 0., 0.],
+        [0., 0., 0., 0., 1., 1., 1., 1., 1.],
+        [0., 0., 0., 0., 1., 1., 1., 1., 1.]])}
+rtol = 0.0001, atol = 0.01, test_name = 'test_tokenize_prompt_and_output'
+force_update = False
+
+    def assert_match(
+        self,
+        actual: _A | dict[str, _A],
+        rtol: float = 1e-4,
+        atol: float = 1e-2,
+        test_name: str | type[DEFAULT] = DEFAULT,
+        force_update: bool | type[DEFAULT] = DEFAULT,
+    ):
+        """
+        Assert that the actual array(s) matches the snapshot.
+    
+        Args:
+            actual: Single NumPy array or dictionary of named arrays
+            test_name: The name of the test (used for the snapshot file)
+            update: If True, update the snapshot instead of comparing
+        """
+        if force_update is DEFAULT:
+            force_update = self.default_force_update
+        if self.always_match_exact:
+            rtol = atol = 0
+        if test_name is DEFAULT:
+            assert self.default_test_name is not None, "Test name must be provided or set as default"
+            test_name = self.default_test_name
+    
+        snapshot_path = self._get_snapshot_path(test_name)
+    
+        # Convert single array to dictionary for consistent handling
+        arrays_dict = actual if isinstance(actual, dict) else {"array": actual}
+        arrays_dict = {k: _canonicalize_array(v) for k, v in arrays_dict.items()}
+    
+    
+        # Load the snapshot
+        expected_arrays = dict(np.load(snapshot_path))
+    
+        # Verify all expected arrays are present
+        missing_keys = set(arrays_dict.keys()) - set(expected_arrays.keys())
+        if missing_keys:
+            raise AssertionError(f"Keys {missing_keys} not found in snapshot for {test_name}")
+    
+        # Verify all actual arrays are expected
+        extra_keys = set(expected_arrays.keys()) - set(arrays_dict.keys())
+        if extra_keys:
+            raise AssertionError(f"Snapshot contains extra keys {extra_keys} for {test_name}")
+    
+        # Compare all arrays
+        for key in arrays_dict:
+&gt;           np.testing.assert_allclose(
+                _canonicalize_array(arrays_dict[key]),
+                expected_arrays[key],
+                rtol=rtol,
+                atol=atol,
+                err_msg=f"Array '{key}' does not match snapshot for {test_name}",
+            )
+E           AssertionError: 
+E           Not equal to tolerance rtol=0.0001, atol=0.01
+E           Array 'input_ids' does not match snapshot for test_tokenize_prompt_and_output
+E           Mismatched elements: 1 / 27 (3.7%)
+E           Max absolute difference among violations: 2
+E           Max relative difference among violations: inf
+E            ACTUAL: array([[3, 2, 4, 2, 3, 2, 4, 2, 0],
+E                  [5, 6, 7, 8, 2, 5, 6, 7, 8],
+E                  [5, 6, 9, 8, 2, 5, 6, 9, 8]])
+E            DESIRED: array([[3, 2, 4, 2, 3, 2, 4, 0, 0],
+E                  [5, 6, 7, 8, 2, 5, 6, 7, 8],
+E                  [5, 6, 9, 8, 2, 5, 6, 9, 8]])
+
+tests/conftest.py:100: AssertionError</failure></testcase><testcase classname="tests.test_grpo" name="test_get_response_log_probs" time="0.119" /><testcase classname="tests.test_grpo" name="test_compute_rollout_rewards" time="0.001" /><testcase classname="tests.test_grpo" name="test_compute_group_normalized_rewards_grpo" time="0.001" /><testcase classname="tests.test_grpo" name="test_compute_group_normalized_rewards_drgrpo" time="0.001" /><testcase classname="tests.test_grpo" name="test_compute_group_normalized_rewards_maxrl" time="0.001" /><testcase classname="tests.test_grpo" name="test_compute_policy_gradient_loss_on_policy" time="0.002" /><testcase classname="tests.test_grpo" name="test_compute_policy_gradient_loss_off_policy" time="0.004" /><testcase classname="tests.test_grpo" name="test_compute_policy_gradient_loss_off_policy_gspo" time="0.002" /><testcase classname="tests.test_grpo" name="test_aggregate_loss_across_microbatch_sequence" time="0.002" /><testcase classname="tests.test_grpo" name="test_aggregate_loss_across_microbatch_constant" time="0.001" /><testcase classname="tests.test_grpo" name="test_grpo_train_step_standard_on_policy" time="0.038" /><testcase classname="tests.test_grpo" name="test_grpo_train_step_variants_on_policy[grpo_constant]" time="0.007" /><testcase classname="tests.test_grpo" name="test_grpo_train_step_variants_on_policy[dr_grpo]" time="0.006" /><testcase classname="tests.test_grpo" name="test_grpo_train_step_variants_on_policy[rft]" time="0.005" /><testcase classname="tests.test_grpo" name="test_grpo_train_step_variants_on_policy[maxrl]" time="0.007" /><testcase classname="tests.test_grpo" name="test_grpo_train_step_off_policy[noclip]" time="0.016" /><testcase classname="tests.test_grpo" name="test_grpo_train_step_off_policy[grpo]" time="0.009" /><testcase classname="tests.test_grpo" name="test_grpo_train_step_off_policy[gspo]" time="0.007" /></testsuite></testsuites>
